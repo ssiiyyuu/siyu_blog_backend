@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siyu.service_statistics.mapper.VisitPerDayMapper">
+    <update id="saveTotal">
+        UPDATE
+            visit_total
+        SET
+            pv = pv + #{pv},
+            uv = uv + #{uv}
+    </update>
+
+    <select id="selectVisitTotal" resultType="map">
+        SELECT
+            pv, uv
+        FROM
+            visit_total
+    </select>
+</mapper>

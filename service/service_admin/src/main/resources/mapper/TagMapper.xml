@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siyu.service_admin.mapper.TagMapper">
+
+    <select id="selectTagList" resultType="com.siyu.service_admin.entity.dto.TagDto">
+        SELECT 
+            id, title, count(tag_id)
+        FROM 
+            tag
+        LEFT OUTER JOIN
+            blog_tag_relation ON id = tag_id
+        GROUP BY
+            id
+    </select>
+
+    <select id="selectTagListByQuery" resultType="com.siyu.service_admin.entity.dto.TagDto">
+        SELECT 
+            id, title, count(tag_id)
+        FROM 
+            tag
+        LEFT OUTER JOIN
+            blog_tag_relation ON id = tag_id
+        WHERE
+            title LIKE concat('%', #{query},'%')
+        GROUP BY
+            id
+    </select>
+
+</mapper>

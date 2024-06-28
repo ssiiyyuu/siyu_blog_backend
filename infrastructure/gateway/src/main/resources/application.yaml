@@ -1,0 +1,43 @@
+server:
+    port: 8270
+spring:
+    application:
+        name: service-gateway
+    profiles:
+        active: prod
+    cloud:
+        nacos:
+            discovery:
+                server-addr: 127.0.0.1:8848
+        gateway:
+            discovery:
+                locator:
+                    enabled: true
+            routes:
+                - id: service-admin
+                  uri: lb://service-admin
+                  predicates:
+                    - Path=/service_admin/**
+                  filters:
+                    - Authorization=backend
+
+                - id: service-oss
+                  uri: lb://service-oss
+                  predicates:
+                    - Path=/service_oss/**
+                  filters:
+                    - Authorization=backend
+
+                - id: service-statistics
+                  uri: lb://service-statistics
+                  predicates:
+                    - Path=/service_statistics/**
+                  filters:
+                    - Authorization=backend
+
+                - id: service-blog
+                  uri: lb://service-blog
+                  predicates:
+                    - Path=/service_blog/**
+                  filters:
+                    - Authorization=frontend

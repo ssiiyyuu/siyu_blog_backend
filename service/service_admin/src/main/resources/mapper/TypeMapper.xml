@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siyu.service_admin.mapper.TypeMapper">
+
+    <select id="selectTypeList" resultType="com.siyu.service_admin.entity.dto.TypeDto">
+        SELECT 
+            type.id AS id,
+            type.title AS title,
+            count(type_id) AS count
+        FROM 
+            type
+        LEFT OUTER JOIN
+            blog ON type.id = type_id
+        GROUP BY
+            type.id
+    </select>
+
+    <select id="selectTypeListByQuery" resultType="com.siyu.service_admin.entity.dto.TypeDto">
+        SELECT 
+            type.id AS id,
+            type.title AS title,
+            count(type_id) AS count
+        FROM 
+            type
+        LEFT OUTER JOIN
+            blog ON type.id = type_id
+        WHERE
+            type.title LIKE concat('%', #{query},'%')
+        GROUP BY
+            type.id
+    </select>
+    
+</mapper>

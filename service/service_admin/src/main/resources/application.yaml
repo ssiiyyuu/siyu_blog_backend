@@ -1,0 +1,23 @@
+# 服务端口
+server:
+  port: 8272
+spring:
+  application:
+    name: service-admin
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  # 环境设置：dev、test、prod
+  profiles:
+    active: dev
+
+  #返回json的全局时间格式 date类型
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  #swagger3整合
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER

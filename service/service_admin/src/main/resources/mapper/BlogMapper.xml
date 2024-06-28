@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siyu.service_admin.mapper.BlogMapper">
+    <resultMap id="resultBlogInfo" type="com.siyu.service_admin.entity.vo.BlogInfoVo">
+        <id column="id" property="id"/>
+        <result column="title"  property="title"/>
+        <result column="description" property="description"/>
+        <result column="cover" property="cover"/>
+        <result column="commentable" property="commentable"/>
+        <result column="sort" property="sort"/>
+        <result column="typeId" property="type_id"/>
+        <collection property="tagIds" column="{blog_id = id}" ofType="String" select="getTagIdsByBlogId"/>
+    </resultMap>
+
+    <resultMap id="resultBlog" type="com.siyu.service_admin.entity.vo.BlogPublishVo">
+        <id column="id" property="id"/>
+        <result column="title"  property="title"/>
+        <result column="author" property="author"/>
+        <result column="commentable" property="commentable"/>
+        <result column="sort" property="sort"/>
+        <result column="published" property="published"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_update" property="gmtUpdate"/>
+        <association property="type" javaType="com.siyu.service_admin.entity.Type">
+            <id column="typeId" property="id"/>
+            <result column="typeTitle" property="title"/>
+        </association>
+        <collection property="tags" column="{blog_id = id}" ofType="com.siyu.service_admin.entity.Tag" select="getTagsByBlogId"/>
+    </resultMap>
+    
+    <select id="getTagsByBlogId" resultType="com.siyu.service_admin.entity.Tag">
+        SELECT
+            tag.id, tag.title
+        FROM
+            tag
+        LEFT OUTER JOIN
+            blog_tag_relation ON blog_tag_relation.tag_id = tag.id
+        WHERE 
+            blog_tag_relation.blog_id = #{blog_id}
+    </select>
+
+    <select id="selectBlogPublishVoById" resultMap="resultBlog">
+        SELECT
+            blog.id,
+            blog.title, 
+            blog.author,
+            blog.commentable, 
+            blog.sort,
+            blog.published, 
+            blog.gmt_create, 
+            blog.gmt_update,
+            type.id AS typeId,
+            type.title AS typeTitle
+        FROM
+            blog
+        LEFT OUTER JOIN
+            type ON blog.type_id = type.id       
+        WHERE
+            blog.id = #{id}
+    </select>
+
+    <select id="getTagIdsByBlogId" resultType="String">
+        SELECT
+            tag.id
+        FROM
+            tag
+        LEFT OUTER JOIN
+            blog_tag_relation ON blog_tag_relation.tag_id = tag.id
+        WHERE
+            blog_tag_relation.blog_id = #{blog_id}
+    </select>
+
+    <select id="selectBlogInfoById" resultMap="resultBlogInfo">
+        SELECT
+            id, title, description,  cover, commentable, sort, type_id
+        FROM
+            blog  
+        WHERE
+            id = #{id}
+    </select>
+
+    <select id="selectBlogContentById" resultType="String">
+        SELECT
+            content
+        FROM
+            blog  
+        WHERE
+            id = #{id}
+    </select>
+
+    <select id="selectBlogExcel" resultType="com.siyu.service_admin.entity.dto.BlogExcel">
+        SELECT
+            id, title, author, cover, description, view, commentable, sort, gmt_create, gmt_update
+        FROM
+            blog
+    </select>
+</mapper>

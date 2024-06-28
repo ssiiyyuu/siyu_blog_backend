@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siyu.service_blog.mapper.TagMapper">
+    <select id="getBlogTags" resultType="String">
+        SELECT
+            tag.title
+        FROM
+            tag
+        LEFT OUTER JOIN
+            blog_tag ON tag.id = blog_tag.tag_id
+        LEFT OUTER JOIN
+            blog ON blog.id = blog_tag.blog_id
+        WHERE
+            blog.id = #{id}
+    </select>
+</mapper>

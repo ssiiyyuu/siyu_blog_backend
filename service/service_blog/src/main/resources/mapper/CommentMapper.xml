@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siyu.service_blog.mapper.CommentMapper">
+    <resultMap id="resultComment" type="com.siyu.service_blog.entity.vo.CommentVo">
+        <id column="id" property="id"/>
+        <result column="parent_id"  property="parentId"/>
+        <result column="name" property="name"/>
+        <result column="avatar" property="avatar"/>
+        <result column="content" property="content"/>
+        <result column="is_admin" property="isAdmin"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <collection property="childs" column="{parent_id = id}" ofType="com.siyu.service_blog.entity.vo.CommentVo" select="getCommentChilds"/>
+    </resultMap>
+
+    <select id="getCommentChilds" resultType="com.siyu.service_blog.entity.vo.CommentVo">
+        SELECT 
+            id, parent_id, name, avatar, content, is_admin, gmt_create
+        FROM
+            comment
+        WHERE
+            is_delete = 0
+        AND
+            parent_id = #{parent_id}
+        ORDER BY
+            gmt_create
+    </select>
+
+    <select id="selectCommentListByBlogId" resultMap="resultComment">
+        SELECT 
+            id, parent_id, name, avatar, content, is_admin, gmt_create
+        FROM
+            comment
+        WHERE
+            is_delete = 0
+        AND
+            parent_id = '-1'
+        AND
+            blog_id = #{id}
+        ORDER BY
+            gmt_create
+    </select>
+</mapper>

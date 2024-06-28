@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siyu.service_blog.mapper.BlogMapper">
+    <resultMap id="resultBlog" type="com.siyu.service_blog.entity.dto.BlogDto">
+        <id column="id" property="id"/>
+        <result column="title"  property="title"/>
+        <result column="author" property="author"/>
+        <result column="description" property="description"/>
+        <result column="cover" property="cover"/>
+        <result column="content" property="content"/>
+        <result column="view" property="view"/>
+        <result column="commentable" property="commentable"/>
+        <result column="sort" property="sort"/>
+        <result column="published" property="published"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_update" property="gmtUpdate"/>
+        <association property="type" javaType="com.siyu.service_blog.entity.Type">
+            <id column="typeId" property="id"/>
+            <result column="typeTitle" property="title"/>
+        </association>
+        <collection property="tags" column="{blog_id = id}" ofType="com.siyu.service_blog.entity.Tag" select="getTagsByBlogId"/>
+    </resultMap>
+    
+    <select id="getTagsByBlogId" resultType="com.siyu.service_blog.entity.Tag">
+        SELECT
+            tag.id, tag.title
+        FROM
+            tag
+        LEFT OUTER JOIN
+            blog_tag_relation ON blog_tag_relation.tag_id = tag.id
+        WHERE 
+            blog_tag_relation.blog_id = #{blog_id}
+    </select>
+
+    <select id="selectBlogDtoById" resultMap="resultBlog">
+        SELECT
+            blog.id,
+            blog.title, 
+            blog.description, 
+            blog.author,
+            blog.cover,
+            blog.content,
+            blog.view, 
+            blog.commentable, 
+            blog.sort,
+            blog.published, 
+            blog.gmt_create, 
+            blog.gmt_update,
+            type.id AS typeId,
+            type.title AS typeTitle
+        FROM
+            blog
+        LEFT OUTER JOIN
+            type ON blog.type_id = type.id       
+        WHERE
+            blog.published = 1
+        AND
+            blog.id = #{id}
+    </select>
+
+    <select id="selectBlogDtoList" resultMap="resultBlog" parameterType="com.siyu.service_blog.mapper.wrapper.CustomWrapper">
+        SELECT
+            blog.id,
+            blog.title, 
+            blog.description, 
+            blog.author,
+            blog.cover,
+            blog.content,
+            blog.view, 
+            blog.commentable, 
+            blog.sort,
+            blog.published, 
+            blog.gmt_create, 
+            blog.gmt_update,
+            type.id AS typeId,
+            type.title AS typeTitle
+        FROM
+            blog
+        LEFT OUTER JOIN
+            type ON blog.type_id = type.id       
+        WHERE
+            blog.published = 1
+        <if test="wrapper != null">
+        AND
+            <if test="wrapper.mode == 'like'">
+                <foreach item="col" collection="wrapper.cols" open="(" separator="OR" close=")">
+                    ${col} like concat('%', #{wrapper.prop},'%')
+                </foreach>
+            </if>
+            <if test="wrapper.mode == 'in'">
+                <foreach item="col" collection="wrapper.cols" open="(" separator="OR" close=")">
+                    ${col} in 
+                    <foreach collection="wrapper.props" item="prop" open="(" separator="," close=")">
+                        #{prop}
+                    </foreach>
+                </foreach>
+            </if>
+            <if test="wrapper.mode != 'like' and wrapper.mode != 'in'">
+                <foreach item="col" collection="wrapper.cols" open="(" separator="OR" close=")">
+                    ${col} ${wrapper.mode} #{wrapper.prop}
+                </foreach>
+            </if>
+        </if>
+        ORDER BY
+            blog.sort DESC, blog.gmt_update DESC   
+    </select>
+</mapper>
